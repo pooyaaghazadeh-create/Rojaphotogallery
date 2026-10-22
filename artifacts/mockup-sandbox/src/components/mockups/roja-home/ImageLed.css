@@ -13,34 +13,31 @@
 .roja-led *, .roja-led *::before, .roja-led *::after { box-sizing: border-box; }
 .roja-led a { color: inherit; text-decoration: none; }
 .roja-led__topbar {
-  height: 82px;
+  min-height: 92px;
   padding: 0 clamp(24px, 6.3vw, 96px);
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   border-bottom: 1px solid var(--led-rule);
 }
 .roja-led__wordmark {
-  justify-self: start;
-  font: 400 30px/1 var(--app-font-serif);
-  letter-spacing: -.045em;
+  font: 400 clamp(30px, 3vw, 39px)/1 var(--app-font-serif);
+  letter-spacing: -.055em;
 }
-.roja-led__wordmark small {
-  display: block;
-  margin-top: 6px;
-  color: #747a75;
-  font: 9px/1 var(--app-font-mono);
-  letter-spacing: .13em;
-  text-transform: uppercase;
-}
-.roja-led__edition, .roja-led__manage {
+.roja-led__manage {
+  min-height: 46px;
+  padding: 0 19px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--led-teal);
+  color: var(--led-paper) !important;
   font: 9px var(--app-font-mono);
-  letter-spacing: .13em;
+  letter-spacing: .14em;
   text-transform: uppercase;
 }
-.roja-led__edition { justify-self: center; color: #777b75; }
-.roja-led__manage { justify-self: end; color: var(--led-teal); border-bottom: 1px solid currentColor; padding-bottom: 5px; }
-.roja-led__manage span { margin-left: 8px; }
+.roja-led__manage span { font-size: 13px; }
 .roja-led__hero {
   max-width: 1600px;
   margin: 0 auto;
@@ -301,10 +298,9 @@
 @keyframes roja-led-appear { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
 
 @media (max-width: 760px) {
-  .roja-led__topbar { min-height: 68px; height: auto; grid-template-columns: 1fr auto; padding: 12px 21px; }
-  .roja-led__edition { display: none; }
-  .roja-led__wordmark { font-size: 27px; }
-  .roja-led__wordmark small { display: none; }
+  .roja-led__topbar { min-height: 76px; padding: 12px 21px; }
+  .roja-led__wordmark { font-size: 31px; }
+  .roja-led__manage { min-height: 44px; padding: 0 15px; font-size: 9px; }
   .roja-led__hero { display: flex; flex-direction: column; align-items: stretch; gap: 33px; padding: 29px 20px 52px; }
   .roja-led__hero-image { order: -1; }
   .roja-led__hero-copy { order: 0; padding: 0; }

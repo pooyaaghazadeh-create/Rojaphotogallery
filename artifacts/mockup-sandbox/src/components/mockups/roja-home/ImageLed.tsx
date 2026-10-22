@@ -24,11 +24,9 @@ export function ImageLed() {
   return (
     <main className="roja-led">
       <header className="roja-led__topbar">
-        <a href="#top" className="roja-led__wordmark" aria-label="Roja home">
-          Roja
-          <small>Photographs &amp; field notes</small>
+        <a href="#top" className="roja-led__wordmark" aria-label="Roja Gallery home">
+          Roja Gallery
         </a>
-        <span className="roja-led__edition">An ongoing city archive</span>
         <a className="roja-led__manage" href="/admin/">Manage <span aria-hidden="true">↗</span></a>
       </header>
 
