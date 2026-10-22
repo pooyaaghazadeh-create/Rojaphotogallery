@@ -10,7 +10,7 @@ then rebuilds the site from those commits.
    Netlify site. The root `netlify.toml` already sets the build command and
    publish directory.
 2. The repository is already set to
-   `pooyaaghazadeh-create/Rojaphotogalley` in `public/admin/config.yml`. Set
+   `pooyaaghazadeh-create/Rojaphotogallery` in `public/admin/config.yml`. Set
    `branch` to the branch Netlify publishes if it is not `main`.
 3. Register a GitHub OAuth app at
    [github.com/settings/developers](https://github.com/settings/developers):

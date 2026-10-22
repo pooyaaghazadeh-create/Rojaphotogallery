@@ -1,6 +1,6 @@
 backend:
   name: github
-  repo: pooyaaghazadeh-create/Rojaphotogalley
+  repo: pooyaaghazadeh-create/Rojaphotogallery
   branch: main
 
 media_folder: public/uploads
