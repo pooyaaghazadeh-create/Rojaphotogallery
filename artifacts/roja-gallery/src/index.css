@@ -398,7 +398,18 @@ a { color: inherit; text-decoration: none; }
   .hero-note { font-size: 23px; max-width: 300px; justify-self: end; }
   .hero-note span { margin-top: 20px; }
   .feature-frame { aspect-ratio: .96; }
-  .feature-caption { padding: 14px 16px; }
+  .feature-caption {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    min-width: 0;
+    padding: 13px 15px;
+    color: #f1eee6;
+    background: linear-gradient(90deg, rgba(25, 32, 34, .94), rgba(25, 32, 34, .68));
+  }
+  .feature-caption span { color: rgba(241, 238, 230, .78); }
+  .feature-caption strong { font-size: 21px; line-height: 1.12; }
   .section-head { padding-top: 58px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: end; }
   .section-head h2 { font-size: clamp(38px, 11vw, 48px); line-height: .95; }
   .section-count { white-space: nowrap; }
