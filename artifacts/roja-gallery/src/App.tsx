@@ -72,7 +72,6 @@ function SiteHeader({ name }: { name?: string }) {
         {name || 'Roja'}
         <small>Photographs &amp; field notes</small>
       </Link>
-      <span className="demo-note" data-testid="text-demo-imagery">Demo imagery · replace with Roja’s photographs</span>
       <a className="nav-link" href="/admin/" data-testid="link-archive-admin">
         Manage <span aria-hidden="true">↗</span>
       </a>
