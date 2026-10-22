@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Link, Route, Switch, useParams } from 'wouter';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Link, Route, Switch, useLocation, useParams } from 'wouter';
 import { ArrowLeft, ArrowRight, X } from 'lucide-react';
 
 type Photo = {
@@ -66,15 +66,144 @@ function useGallery() {
 }
 
 function SiteHeader() {
+  const [location] = useLocation();
+  const navItems = [
+    { href: '/', label: 'Home', testId: 'nav-home' },
+    { href: '/albums', label: 'Albums', testId: 'nav-albums' },
+    { href: '/contact', label: 'Contact', testId: 'nav-contact' },
+  ];
+
   return (
     <header className="topbar topbar--gallery">
       <Link href="/" className="wordmark" data-testid="link-home" aria-label="Roja Gallery home">
         Roja Gallery
       </Link>
+      <nav className="site-nav" aria-label="Main navigation">
+        {navItems.map(({ href, label, testId }) => {
+          const active = href === '/'
+            ? location === '/'
+            : href === '/albums'
+              ? location === '/albums' || location.startsWith('/album/')
+              : location === href;
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={`site-nav__link${active ? ' is-active' : ''}`}
+              aria-current={active ? 'page' : undefined}
+              data-testid={testId}
+            >
+              {label}
+            </Link>
+          );
+        })}
+      </nav>
       <a className="nav-link" href="/admin/" data-testid="link-archive-admin">
         Manage <span aria-hidden="true">↗</span>
       </a>
     </header>
+  );
+}
+
+function AlbumScroller({ albums }: { albums: Album[] }) {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [canScrollPrevious, setCanScrollPrevious] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(false);
+
+  const updateScrollState = useCallback(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    setCanScrollPrevious(track.scrollLeft > 2);
+    setCanScrollNext(track.scrollLeft + track.clientWidth < track.scrollWidth - 2);
+  }, []);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    updateScrollState();
+    if (typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(updateScrollState);
+    observer.observe(track);
+    Array.from(track.children).forEach((child) => observer.observe(child));
+    return () => observer.disconnect();
+  }, [albums.length, updateScrollState]);
+
+  const scrollAlbums = (direction: -1 | 1) => {
+    const track = trackRef.current;
+    if (!track) return;
+    track.scrollBy({
+      left: direction * Math.max(track.clientWidth * 0.78, 240),
+      behavior: 'smooth',
+    });
+  };
+
+  return (
+    <section className="album-scroller" aria-label="Browse Roja’s albums">
+      <div className="album-scroller__toolbar">
+        <span className="eyebrow">Swipe or use the arrows</span>
+        <div className="album-scroller__controls">
+          <button
+            type="button"
+            className="album-scroller__control"
+            aria-label="Scroll albums left"
+            onClick={() => scrollAlbums(-1)}
+            disabled={!canScrollPrevious}
+            data-testid="button-scroll-albums-left"
+          >
+            <ArrowLeft size={18} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            className="album-scroller__control"
+            aria-label="Scroll albums right"
+            onClick={() => scrollAlbums(1)}
+            disabled={!canScrollNext}
+            data-testid="button-scroll-albums-right"
+          >
+            <ArrowRight size={18} aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+      <div
+        className="album-scroller__track"
+        ref={trackRef}
+        onScroll={updateScrollState}
+        tabIndex={0}
+        aria-label="Album cards; scroll horizontally to explore"
+        data-testid="album-scroller-track"
+      >
+        {albums.map((album, index) => {
+          const image = album.cover || album.photos[0]?.image;
+          return (
+            <Link
+              key={album.slug}
+              href={`/album/${album.slug}`}
+              className="album-scroller__card"
+              aria-label={`Open ${album.title}, ${album.city}`}
+              data-testid={`card-album-${album.slug}`}
+            >
+              <div className="album-scroller__image">
+                {image ? (
+                  <img src={image} alt={`${album.city}, from ${album.title}`} loading="lazy" />
+                ) : (
+                  <span className="album-scroller__empty">Photographs coming soon</span>
+                )}
+                <span className="album-scroller__number">{String(index + 1).padStart(2, '0')}</span>
+              </div>
+              <div className="album-scroller__meta">
+                <span>{album.city} · {album.year}</span>
+                <span>{String(album.photos.length).padStart(2, '0')} photographs</span>
+              </div>
+              <h3>{album.title}</h3>
+              {album.description && <p>{album.description}</p>}
+              <span className="album-scroller__open">
+                Open album <ArrowRight size={14} aria-hidden="true" />
+              </span>
+            </Link>
+          );
+        })}
+      </div>
+    </section>
   );
 }
 
@@ -132,43 +261,6 @@ function HomePage({ gallery }: { gallery: Gallery }) {
   const intro = gallery.intro?.trim();
   const featuredAlbumIndex = firstAlbum ? albums.indexOf(firstAlbum) + 1 : 0;
 
-  const renderChapterImage = (album: Album, index: number) => {
-    const image = album.cover || album.photos[0]?.image;
-    const imageContent = image ? (
-      <>
-        <img
-          src={image}
-          alt={`${album.city}, from ${album.title}`}
-          loading="lazy"
-        />
-        <span className="roja-home__frame-label">{album.city} · {album.title}</span>
-        <span className="roja-home__frame-number">{String(index + 1).padStart(2, '0')}</span>
-      </>
-    ) : (
-      <span className="skeleton skeleton-card" aria-hidden="true" />
-    );
-
-    return image ? (
-      <Link
-        href={`/album/${album.slug}`}
-        className="roja-home__chapter-image"
-        data-testid={`link-album-${album.slug}`}
-        aria-label={`Open ${album.title}, ${album.city}`}
-        key={`${album.slug}-image`}
-      >
-        {imageContent}
-      </Link>
-    ) : (
-      <div
-        className="roja-home__chapter-image roja-home__chapter-image--empty"
-        aria-label={`${album.title} album cover`}
-        key={`${album.slug}-image`}
-      >
-        {imageContent}
-      </div>
-    );
-  };
-
   return (
     <main className="site-shell roja-home">
       <SiteHeader />
@@ -180,9 +272,9 @@ function HomePage({ gallery }: { gallery: Gallery }) {
             {intro || 'A collection of small moments found in the city’s everyday rhythm.'}
           </p>
           <div className="roja-home__byline">{gallery.photographer || 'Roja'} — photographer &amp; observer</div>
-          <a className="roja-home__discover" href="#albums">
-            <span>Explore the archive</span><span aria-hidden="true">↓</span>
-          </a>
+          <Link className="roja-home__discover" href="/albums">
+            <span>Explore the albums</span><span aria-hidden="true">↓</span>
+          </Link>
         </div>
 
         {featureImage && firstAlbum ? (
@@ -211,33 +303,17 @@ function HomePage({ gallery }: { gallery: Gallery }) {
       <section className="roja-home__chapters" id="albums">
         <div className="roja-home__section-head">
           <div>
-            <div className="eyebrow roja-home__eyebrow">Selected chapters</div>
+            <div className="eyebrow roja-home__eyebrow">Selected albums</div>
             <h2>Places, <em>in passing.</em></h2>
           </div>
-          <div className="roja-home__count"><span>{String(albums.length).padStart(2, '0')}</span> albums in the archive</div>
+          <div className="roja-home__section-actions">
+            <div className="roja-home__count"><span>{String(albums.length).padStart(2, '0')}</span> albums in the archive</div>
+            <Link className="roja-home__all-albums" href="/albums">View all albums <ArrowRight size={14} aria-hidden="true" /></Link>
+          </div>
         </div>
 
         {albums.length ? (
-          <div className="roja-home__chapter-list">
-            {albums.map((album, index) => (
-              <article
-                className={`roja-home__chapter${index % 2 === 1 ? ' roja-home__chapter--reverse' : ''}`}
-                key={album.slug}
-              >
-                {index % 2 === 0 && renderChapterImage(album, index)}
-                <div className="roja-home__chapter-copy">
-                  <span className="roja-home__chapter-kicker">Chapter {String(index + 1).padStart(2, '0')} <i aria-hidden="true" /> {album.year}</span>
-                  <Link href={`/album/${album.slug}`} className="roja-home__chapter-title">{album.title}</Link>
-                  <span className="roja-home__chapter-city">{album.city}</span>
-                  {album.description && <p>{album.description}</p>}
-                  <Link href={`/album/${album.slug}`} className="roja-home__open">
-                    Enter this chapter <span aria-hidden="true">↗</span>
-                  </Link>
-                </div>
-                {index % 2 === 1 && renderChapterImage(album, index)}
-              </article>
-            ))}
-          </div>
+          <AlbumScroller albums={albums.slice(0, 3)} />
         ) : (
           <div className="state-panel" data-testid="status-albums-empty">
             <h2>Waiting for the city.</h2>
@@ -258,6 +334,67 @@ function HomePage({ gallery }: { gallery: Gallery }) {
       <footer className="footer">
         <span>© {new Date().getFullYear()} {gallery.photographer || 'Roja'} · Made while walking</span>
         {gallery.contactEmail && <a href={`mailto:${gallery.contactEmail}`}>Say hello <span aria-hidden="true">↗</span></a>}
+      </footer>
+    </main>
+  );
+}
+
+function AlbumsPage({ gallery }: { gallery: Gallery }) {
+  useEffect(() => {
+    document.title = `Albums — ${gallery.photographer || 'Roja Gallery'}`;
+  }, [gallery.photographer]);
+
+  return (
+    <main className="site-shell">
+      <SiteHeader />
+      <header className="albums-page__intro entrance">
+        <div>
+          <div className="eyebrow">The city, in chapters</div>
+          <h1>Albums <em>in motion.</em></h1>
+        </div>
+        <p>Move through Roja’s city stories. Swipe across the photographs or use the arrows to explore each album.</p>
+      </header>
+      {gallery.albums.length ? (
+        <AlbumScroller albums={gallery.albums} />
+      ) : (
+        <section className="state-panel" data-testid="status-albums-empty">
+          <h2>Waiting for the city.</h2>
+          <p>New albums will appear here when the photographs are ready.</p>
+        </section>
+      )}
+      <footer className="footer">
+        <Link href="/" className="back-link">← Home</Link>
+        <span>{String(gallery.albums.length).padStart(2, '0')} albums · City photography by {gallery.photographer || 'Roja'}</span>
+      </footer>
+    </main>
+  );
+}
+
+function ContactPage({ gallery }: { gallery: Gallery }) {
+  const email = gallery.contactEmail?.trim();
+
+  useEffect(() => {
+    document.title = `Contact — ${gallery.photographer || 'Roja Gallery'}`;
+  }, [gallery.photographer]);
+
+  return (
+    <main className="site-shell">
+      <SiteHeader />
+      <section className="contact-page entrance">
+        <div className="eyebrow">Prints · commissions · collaborations</div>
+        <h1>Let’s make room <em>for the city.</em></h1>
+        <p>For print inquiries, photography commissions, licensing, or collaborations, get in touch with Roja.</p>
+        {email ? (
+          <a className="contact-page__email" href={`mailto:${email}`}>
+            {email} <ArrowRight size={16} aria-hidden="true" />
+          </a>
+        ) : (
+          <p className="contact-page__pending" role="status">Contact details will appear here once Roja adds an email in gallery settings.</p>
+        )}
+      </section>
+      <footer className="footer">
+        <Link href="/" className="back-link">← Home</Link>
+        <span>Roja Gallery · City photography</span>
       </footer>
     </main>
   );
@@ -331,7 +468,7 @@ function AlbumPage({ gallery }: { gallery: Gallery }) {
           <span className="eyebrow">No such chapter</span>
           <h2>This place is elsewhere.</h2>
           <p>The album may have moved, or perhaps it has not been added to the archive yet.</p>
-          <Link href="/" className="back-link">← Return to all albums</Link>
+          <Link href="/albums" className="back-link">← Return to all albums</Link>
         </section>
       </main>
     );
@@ -342,7 +479,7 @@ function AlbumPage({ gallery }: { gallery: Gallery }) {
       <SiteHeader />
       <header className="album-hero entrance">
         <div>
-          <Link href="/" className="back-link" data-testid="link-back-albums"><ArrowLeft size={13} style={{ verticalAlign: 'middle', marginRight: 7 }} />All albums</Link>
+          <Link href="/albums" className="back-link" data-testid="link-back-albums"><ArrowLeft size={13} style={{ verticalAlign: 'middle', marginRight: 7 }} />All albums</Link>
           <div className="eyebrow" style={{ marginTop: 35 }}>{album.city} · {album.year}</div>
           <h1>{album.title}</h1>
         </div>
@@ -369,7 +506,7 @@ function AlbumPage({ gallery }: { gallery: Gallery }) {
         </section>
       )}
       <footer className="footer">
-        <Link href="/" className="back-link">← Browse the archive</Link>
+        <Link href="/albums" className="back-link">← Browse the albums</Link>
         <span>{album.city} · {album.year}</span>
       </footer>
       {selectedIndex !== null && (
@@ -393,19 +530,26 @@ function NotFoundPage() {
   );
 }
 
-function GalleryRoute({ album = false }: { album?: boolean }) {
+type GalleryPage = 'home' | 'albums' | 'contact' | 'album';
+
+function GalleryRoute({ page = 'home' }: { page?: GalleryPage }) {
   const state = useGallery();
   if (state.status === 'loading') return <LoadingView />;
   if (state.status === 'error') return <ErrorView message={state.error} retry={state.reload} />;
+  if (page === 'albums') return <AlbumsPage gallery={state.gallery} />;
+  if (page === 'contact') return <ContactPage gallery={state.gallery} />;
+  if (page === 'album') return <AlbumPage gallery={state.gallery} />;
   if (!state.gallery.albums.length) return <EmptyView />;
-  return album ? <AlbumPage gallery={state.gallery} /> : <HomePage gallery={state.gallery} />;
+  return <HomePage gallery={state.gallery} />;
 }
 
 function App() {
   return (
     <Switch>
-      <Route path="/" component={() => <GalleryRoute />} />
-      <Route path="/album/:slug" component={() => <GalleryRoute album />} />
+      <Route path="/" component={() => <GalleryRoute page="home" />} />
+      <Route path="/albums" component={() => <GalleryRoute page="albums" />} />
+      <Route path="/contact" component={() => <GalleryRoute page="contact" />} />
+      <Route path="/album/:slug" component={() => <GalleryRoute page="album" />} />
       <Route component={NotFoundPage} />
     </Switch>
   );
