@@ -65,14 +65,12 @@ function useGallery() {
   return { ...state, reload: load };
 }
 
-function SiteHeader({ name, home = false }: { name?: string; home?: boolean }) {
+function SiteHeader() {
   return (
-    <header className={`topbar${home ? ' roja-home__topbar' : ''}`}>
-      <Link href="/" className="wordmark" data-testid="link-home">
-        {name || 'Roja'}
-        <small>Photographs &amp; field notes</small>
+    <header className="topbar topbar--gallery">
+      <Link href="/" className="wordmark" data-testid="link-home" aria-label="Roja Gallery home">
+        Roja Gallery
       </Link>
-      {home && <span className="roja-home__edition">An ongoing city archive</span>}
       <a className="nav-link" href="/admin/" data-testid="link-archive-admin">
         Manage <span aria-hidden="true">↗</span>
       </a>
@@ -110,10 +108,10 @@ function ErrorView({ message, retry }: { message: string; retry: () => void }) {
   );
 }
 
-function EmptyView({ name }: { name?: string }) {
+function EmptyView() {
   return (
     <main className="site-shell">
-      <SiteHeader name={name} />
+      <SiteHeader />
       <section className="state-panel" data-testid="status-gallery-empty">
         <span className="eyebrow">The first frame is still coming</span>
         <h2>An archive in progress.</h2>
@@ -173,7 +171,7 @@ function HomePage({ gallery }: { gallery: Gallery }) {
 
   return (
     <main className="site-shell roja-home">
-      <SiteHeader name={gallery.photographer} home />
+      <SiteHeader />
       <section className="roja-home__hero entrance" id="top" aria-label="Roja city photography">
         <div className="roja-home__hero-copy">
           <div className="eyebrow roja-home__eyebrow"><span aria-hidden="true" />A living record of elsewhere</div>
@@ -328,7 +326,7 @@ function AlbumPage({ gallery }: { gallery: Gallery }) {
   if (!album) {
     return (
       <main className="site-shell">
-        <SiteHeader name={gallery.photographer} />
+        <SiteHeader />
         <section className="state-panel" data-testid="status-album-not-found">
           <span className="eyebrow">No such chapter</span>
           <h2>This place is elsewhere.</h2>
@@ -341,7 +339,7 @@ function AlbumPage({ gallery }: { gallery: Gallery }) {
 
   return (
     <main className="site-shell">
-      <SiteHeader name={gallery.photographer} />
+      <SiteHeader />
       <header className="album-hero entrance">
         <div>
           <Link href="/" className="back-link" data-testid="link-back-albums"><ArrowLeft size={13} style={{ verticalAlign: 'middle', marginRight: 7 }} />All albums</Link>
@@ -399,7 +397,7 @@ function GalleryRoute({ album = false }: { album?: boolean }) {
   const state = useGallery();
   if (state.status === 'loading') return <LoadingView />;
   if (state.status === 'error') return <ErrorView message={state.error} retry={state.reload} />;
-  if (!state.gallery.albums.length) return <EmptyView name={state.gallery.photographer} />;
+  if (!state.gallery.albums.length) return <EmptyView />;
   return album ? <AlbumPage gallery={state.gallery} /> : <HomePage gallery={state.gallery} />;
 }
 

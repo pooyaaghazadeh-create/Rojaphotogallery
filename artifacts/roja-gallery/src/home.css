@@ -7,28 +7,46 @@
   outline-offset: 4px;
 }
 
-.roja-home .topbar.roja-home__topbar {
-  height: 82px;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+.topbar.topbar--gallery {
+  height: auto;
+  min-height: 92px;
+  padding: 0 clamp(24px, 6.3vw, 96px);
+  display: flex;
   align-items: center;
-  border-bottom-color: var(--home-rule);
+  justify-content: space-between;
 }
 
-.roja-home__edition {
-  justify-self: center;
-  color: var(--quiet);
+.topbar--gallery .wordmark {
+  font: 400 clamp(30px, 3vw, 39px)/1 var(--app-font-serif);
+  letter-spacing: -.055em;
+}
+
+.topbar--gallery .wordmark small {
+  display: none;
+}
+
+.topbar--gallery .nav-link {
+  min-height: 46px;
+  padding: 0 19px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: 0;
+  background: var(--teal);
+  color: var(--paper);
   font: 9px var(--app-font-mono);
-  letter-spacing: .13em;
+  letter-spacing: .14em;
   text-transform: uppercase;
 }
 
-.roja-home .topbar.roja-home__topbar .wordmark {
-  justify-self: start;
+.topbar--gallery .nav-link span {
+  font-size: 13px;
 }
 
-.roja-home .topbar.roja-home__topbar .nav-link {
-  justify-self: end;
+.topbar--gallery a:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 4px;
 }
 
 .roja-home__hero {
@@ -409,17 +427,19 @@
 }
 
 @media (max-width: 760px) {
-  .roja-home .topbar.roja-home__topbar {
+  .topbar.topbar--gallery {
     height: auto;
-    min-height: 68px;
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-rows: auto;
-    gap: 0;
+    min-height: 76px;
     padding: 12px 21px;
   }
 
-  .roja-home__edition {
-    display: none;
+  .topbar--gallery .wordmark {
+    font-size: 31px;
+  }
+
+  .topbar--gallery .nav-link {
+    min-height: 44px;
+    padding: 0 15px;
   }
 
   .roja-home__hero {
@@ -563,7 +583,7 @@
 }
 
 @media (max-width: 390px) {
-  .roja-home .topbar.roja-home__topbar {
+  .topbar.topbar--gallery {
     padding-right: 17px;
     padding-left: 17px;
   }
