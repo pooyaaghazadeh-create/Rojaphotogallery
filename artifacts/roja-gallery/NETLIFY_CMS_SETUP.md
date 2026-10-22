@@ -9,10 +9,9 @@ then rebuilds the site from those commits.
 1. Push this project to a GitHub repository and connect that repository to a
    Netlify site. The root `netlify.toml` already sets the build command and
    publish directory.
-2. In `public/admin/config.yml`, replace
-   `YOUR_GITHUB_USERNAME/YOUR_REPOSITORY` with the repository's
-   `owner/repository` name. Set `branch` to the branch Netlify publishes if it
-   is not `main`.
+2. The repository is already set to
+   `pooyaaghazadeh-create/Rojaphotogalley` in `public/admin/config.yml`. Set
+   `branch` to the branch Netlify publishes if it is not `main`.
 3. In Netlify's authentication-provider settings, enable GitHub authentication
    for the site. Decap CMS uses Netlify's GitHub authentication endpoint; see
    [Decap's GitHub backend guide](https://decapcms.org/docs/github-backend/).
