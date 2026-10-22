@@ -1,0 +1,68 @@
+backend:
+  name: github
+  repo: YOUR_GITHUB_USERNAME/YOUR_REPOSITORY
+  branch: main
+
+media_folder: public/uploads
+public_folder: /uploads
+
+collections:
+  - name: gallery
+    label: Gallery
+    files:
+      - name: portfolio
+        label: Portfolio content
+        file: public/content/gallery.json
+        format: json
+        fields:
+          - label: Photographer
+            name: photographer
+            widget: string
+          - label: Introduction
+            name: intro
+            widget: text
+          - label: Contact email
+            name: contactEmail
+            widget: string
+            required: false
+          - label: Albums
+            name: albums
+            widget: list
+            summary: "{{fields.title}} — {{fields.city}}"
+            fields:
+              - label: URL slug
+                name: slug
+                widget: string
+                hint: Short lowercase name used in the album URL, e.g. istanbul-at-dusk
+              - label: Album title
+                name: title
+                widget: string
+              - label: City
+                name: city
+                widget: string
+              - label: Year
+                name: year
+                widget: string
+              - label: Description
+                name: description
+                widget: text
+              - label: Cover photo
+                name: cover
+                widget: image
+              - label: Photos
+                name: photos
+                widget: list
+                summary: "{{fields.title}}"
+                fields:
+                  - label: Photo
+                    name: image
+                    widget: image
+                  - label: Photo title
+                    name: title
+                    widget: string
+                  - label: Caption
+                    name: caption
+                    widget: text
+                  - label: Image description for accessibility
+                    name: alt
+                    widget: string

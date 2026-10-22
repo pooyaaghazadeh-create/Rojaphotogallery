@@ -1,0 +1,62 @@
+{
+  "photographer": "Roja",
+  "intro": "A collection of small moments found in the city's everyday rhythm.",
+  "contactEmail": "",
+  "albums": [
+    {
+      "slug": "between-the-stops",
+      "title": "Between the Stops",
+      "city": "Istanbul",
+      "year": "2025",
+      "description": "Rain-darkened streets, late windows, and the quiet pause between one place and the next.",
+      "cover": "/uploads/istanbul-after-rain.jpg",
+      "photos": [
+        {
+          "id": "istanbul-after-rain",
+          "image": "/uploads/istanbul-after-rain.jpg",
+          "title": "After the Rain",
+          "caption": "A shop light stretches across the stones just after the evening shower.",
+          "alt": "Warm shop light reflected on a rain-darkened Istanbul street"
+        },
+        {
+          "id": "platform-light",
+          "image": "/uploads/platform-light.jpg",
+          "title": "Platform Light",
+          "caption": "A brief meeting of reflections and silhouettes at the end of the day.",
+          "alt": "Silhouettes and reflections on a city transit platform at dusk"
+        },
+        {
+          "id": "last-tram",
+          "image": "/uploads/last-tram.jpg",
+          "title": "The Last Tram",
+          "caption": "The street goes quiet as the tram carries the last warm light through.",
+          "alt": "A tram moving through a rainy city street at night"
+        }
+      ]
+    },
+    {
+      "slug": "long-shadows",
+      "title": "Long Shadows",
+      "city": "Lisbon",
+      "year": "2024",
+      "description": "A study of open space, long afternoon light, and the people who give a city its scale.",
+      "cover": "/uploads/long-shadows.jpg",
+      "photos": [
+        {
+          "id": "long-shadows-plaza",
+          "image": "/uploads/long-shadows.jpg",
+          "title": "Crossing the Plaza",
+          "caption": "One small figure moves through a wide field of afternoon light.",
+          "alt": "A cyclist crossing a sunlit city plaza with long shadows"
+        },
+        {
+          "id": "istanbul-after-rain-detail",
+          "image": "/uploads/istanbul-after-rain.jpg",
+          "title": "A Little Light",
+          "caption": "A familiar corner changes when the day begins to close.",
+          "alt": "A softly lit storefront on a city street at dusk"
+        }
+      ]
+    }
+  ]
+}

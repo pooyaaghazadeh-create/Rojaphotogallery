@@ -1,0 +1,1 @@
+- [Roja gallery positioning](roja-gallery-positioning.md) — Roja is a city photographer; keep the portfolio focused on city photography.

@@ -1,0 +1,4 @@
+[build]
+  command = "PORT=3000 BASE_PATH=/ pnpm --filter @workspace/roja-gallery run build"
+  publish = "artifacts/roja-gallery/dist/public"
+
