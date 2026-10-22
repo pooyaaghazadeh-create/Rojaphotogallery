@@ -354,6 +354,17 @@ a { color: inherit; text-decoration: none; }
 .viewer-controls button:hover, .viewer-close:hover { color: #e0a28a; border-color: #e0a28a; }
 .viewer-close { position: absolute; top: 20px; right: 24px; width: 42px; padding: 0; font-size: 18px; }
 .viewer-arrow { position: absolute; top: 50%; transform: translateY(-50%); border: 1px solid rgba(241,238,230,.35); color: #f1eee6; background: rgba(25,32,34,.35); width: 44px; height: 44px; border-radius: 50%; cursor: pointer; font-size: 20px; }
+.viewer-close,
+.viewer-arrow {
+  display: grid;
+  place-items: center;
+  line-height: 0;
+}
+.viewer-close svg,
+.viewer-arrow svg {
+  display: block;
+  flex: none;
+}
 .viewer-prev { left: 22px; }.viewer-next { right: 22px; }
 .state-panel { min-height: 58vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 35px; }
 .state-panel h2 { font: 400 42px var(--app-font-serif); margin: 0 0 12px; }
