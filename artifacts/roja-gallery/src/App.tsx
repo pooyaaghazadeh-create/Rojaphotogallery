@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, Route, Switch, useLocation, useParams } from 'wouter';
-import { ArrowLeft, ArrowRight, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Pause, Play, X } from 'lucide-react';
 
 type Photo = {
   id?: string;
@@ -98,9 +98,6 @@ function SiteHeader() {
           );
         })}
       </nav>
-      <a className="nav-link" href="/admin/" data-testid="link-archive-admin">
-        Manage <span aria-hidden="true">↗</span>
-      </a>
     </header>
   );
 }
@@ -207,6 +204,116 @@ function AlbumScroller({ albums }: { albums: Album[] }) {
   );
 }
 
+function PhotoMarquee({ albums }: { albums: Album[] }) {
+  const [isPaused, setIsPaused] = useState(false);
+  const photos = albums.flatMap((album) => {
+    const albumPhotos = album.photos.filter((photo) => Boolean(photo.image));
+    const featuredPhotos = albumPhotos.length
+      ? albumPhotos
+      : album.cover
+        ? [{
+            image: album.cover,
+            title: album.title,
+            caption: album.description,
+            alt: `${album.city}, from the ${album.title} album`,
+          }]
+        : [];
+
+    return featuredPhotos.map((photo) => ({
+      ...photo,
+      albumSlug: album.slug,
+      albumTitle: album.title,
+      city: album.city,
+      year: album.year,
+    }));
+  });
+
+  if (!photos.length) {
+    return (
+      <section className="roja-home__chapters roja-home__photo-marquee" id="albums">
+        <div className="roja-home__photo-marquee-empty">
+          <div className="eyebrow">From the archive</div>
+          <h2>City moments, <em>coming soon.</em></h2>
+          <p>Roja’s photographs will appear here as they are added to the gallery.</p>
+        </div>
+      </section>
+    );
+  }
+
+  const loopPhotos = Array.from(
+    { length: Math.max(1, Math.ceil(8 / photos.length)) },
+    () => photos,
+  ).flat();
+  const duration = `${Math.max(48, loopPhotos.length * 6)}s`;
+
+  const renderPhoto = (photo: (typeof loopPhotos)[number], index: number, duplicate = false) => {
+    const content = (
+      <>
+        <img
+          src={photo.image}
+          alt={duplicate ? '' : photo.alt || photo.title}
+          loading={duplicate || index > 2 ? 'lazy' : 'eager'}
+          decoding="async"
+        />
+        <span className="roja-home__photo-marquee-caption">
+          <span className="eyebrow">{photo.city} · {photo.year}</span>
+          <strong>{photo.title}</strong>
+        </span>
+      </>
+    );
+    const className = 'roja-home__photo-marquee-card';
+    const key = `${photo.albumSlug}-${photo.id || photo.title}-${index}`;
+
+    return duplicate ? (
+      <div className={className} key={key}>{content}</div>
+    ) : (
+      <Link
+        className={className}
+        href={`/album/${photo.albumSlug}`}
+        aria-label={`Open ${photo.title} in ${photo.albumTitle}, ${photo.city}`}
+        key={key}
+      >
+        {content}
+      </Link>
+    );
+  };
+
+  return (
+    <section className={`roja-home__chapters roja-home__photo-marquee${isPaused ? ' is-paused' : ''}`} id="albums">
+      <div className="roja-home__section-head roja-home__photo-marquee-head">
+        <div>
+          <div className="eyebrow roja-home__eyebrow">From the archive</div>
+          <h2>Details in <em>motion.</em></h2>
+        </div>
+        <div className="roja-home__photo-marquee-tools">
+          <span className="roja-home__photo-marquee-note">Photographs from Roja’s city walks</span>
+          <button
+            className="roja-home__photo-marquee-toggle"
+            type="button"
+            aria-label={isPaused ? 'Resume moving photographs' : 'Pause moving photographs'}
+            aria-pressed={isPaused}
+            onClick={() => setIsPaused((paused) => !paused)}
+            data-testid="button-toggle-photo-marquee"
+          >
+            {isPaused ? <Play size={14} aria-hidden="true" /> : <Pause size={14} aria-hidden="true" />}
+            <span>{isPaused ? 'Resume' : 'Pause'}</span>
+          </button>
+        </div>
+      </div>
+      <div className="roja-home__photo-marquee-viewport" role="region" aria-label="Moving photographs from Roja’s archive" tabIndex={0}>
+        <div className="roja-home__photo-marquee-track" style={{ animationDuration: duration }}>
+          <div className="roja-home__photo-marquee-group">
+            {loopPhotos.map((photo, index) => renderPhoto(photo, index))}
+          </div>
+          <div className="roja-home__photo-marquee-group" aria-hidden="true">
+            {loopPhotos.map((photo, index) => renderPhoto(photo, index, true))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function LoadingView() {
   return (
     <main className="site-shell" aria-label="Loading photo archive" data-testid="status-gallery-loading">
@@ -300,27 +407,7 @@ function HomePage({ gallery }: { gallery: Gallery }) {
         <div className="roja-home__margin-note" aria-hidden="true">A living record<br />of elsewhere</div>
       </section>
 
-      <section className="roja-home__chapters" id="albums">
-        <div className="roja-home__section-head">
-          <div>
-            <div className="eyebrow roja-home__eyebrow">Selected albums</div>
-            <h2>Places, <em>in passing.</em></h2>
-          </div>
-          <div className="roja-home__section-actions">
-            <div className="roja-home__count"><span>{String(albums.length).padStart(2, '0')}</span> albums in the archive</div>
-            <Link className="roja-home__all-albums" href="/albums">View all albums <ArrowRight size={14} aria-hidden="true" /></Link>
-          </div>
-        </div>
-
-        {albums.length ? (
-          <AlbumScroller albums={albums.slice(0, 3)} />
-        ) : (
-          <div className="state-panel" data-testid="status-albums-empty">
-            <h2>Waiting for the city.</h2>
-            <p>New chapters will appear here when the photographs are ready.</p>
-          </div>
-        )}
-      </section>
+      <PhotoMarquee albums={albums} />
 
       <section className="intro-band roja-home__interlude">
         <div className="roja-home__interlude-mark" aria-hidden="true">R.</div>
@@ -333,7 +420,12 @@ function HomePage({ gallery }: { gallery: Gallery }) {
       </section>
       <footer className="footer">
         <span>© {new Date().getFullYear()} {gallery.photographer || 'Roja'} · Made while walking</span>
-        {gallery.contactEmail && <a href={`mailto:${gallery.contactEmail}`}>Say hello <span aria-hidden="true">↗</span></a>}
+        <div className="footer__actions">
+          {gallery.contactEmail && <a href={`mailto:${gallery.contactEmail}`}>Say hello <span aria-hidden="true">↗</span></a>}
+          <a className="footer__manage" href="/admin/" data-testid="link-homepage-manage">
+            Manage <span aria-hidden="true">↗</span>
+          </a>
+        </div>
       </footer>
     </main>
   );

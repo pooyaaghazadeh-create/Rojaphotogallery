@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import './_group.css';
 import './ImageLed.css';
 
@@ -19,15 +20,28 @@ const albums = [
     alt: 'Long afternoon shadows crossing a Lisbon street',
   },
 ];
+const stripFrames = [...albums, ...albums];
 
 export function ImageLed() {
+  const [stripPaused, setStripPaused] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+  );
+
+  useEffect(() => {
+    const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const pauseForReducedMotion = (event: MediaQueryListEvent) => {
+      if (event.matches) setStripPaused(true);
+    };
+    preference.addEventListener('change', pauseForReducedMotion);
+    return () => preference.removeEventListener('change', pauseForReducedMotion);
+  }, []);
+
   return (
     <main className="roja-led">
       <header className="roja-led__topbar">
         <a href="#top" className="roja-led__wordmark" aria-label="Roja Gallery home">
           Roja Gallery
         </a>
-        <a className="roja-led__manage" href="/admin/">Manage <span aria-hidden="true">↗</span></a>
       </header>
 
       <section className="roja-led__hero" id="top">
@@ -55,41 +69,39 @@ export function ImageLed() {
       <section className="roja-led__chapters" id="albums">
         <div className="roja-led__section-head">
           <div>
-            <div className="roja-led__eyebrow">Selected chapters</div>
-            <h2>Places, <em>in passing.</em></h2>
+            <div className="roja-led__eyebrow">From the archive</div>
+            <h2>Details <em>in motion.</em></h2>
           </div>
-          <div className="roja-led__count"><span>02</span> albums in the archive</div>
         </div>
-
-        <article className="roja-led__chapter roja-led__chapter--first">
-          <a href={`/album/${albums[0].slug}`} className="roja-led__chapter-image">
-            <img src={albums[0].cover} alt={albums[0].alt} loading="lazy" />
-            <span className="roja-led__frame-label">I / Istanbul, in the rain</span>
-            <span className="roja-led__frame-number">01</span>
-          </a>
-          <div className="roja-led__chapter-copy">
-            <span className="roja-led__chapter-kicker">Chapter 01 <i /> 2025</span>
-            <a href={`/album/${albums[0].slug}`} className="roja-led__chapter-title">{albums[0].title}</a>
-            <span className="roja-led__chapter-city">{albums[0].city}</span>
-            <p>Rain-darkened streets, late windows, and the quiet pause between one place and the next.</p>
-            <a href={`/album/${albums[0].slug}`} className="roja-led__open">Enter this chapter <span aria-hidden="true">↗</span></a>
+        <div className="roja-led__strip-controls">
+          <span>A moving frame of city light</span>
+          <button
+            type="button"
+            className="roja-led__strip-toggle"
+            aria-pressed={stripPaused}
+            onClick={() => setStripPaused((paused) => !paused)}
+          >
+            {stripPaused ? 'Resume strip' : 'Pause strip'}
+            <span aria-hidden="true">{stripPaused ? '▶' : 'Ⅱ'}</span>
+          </button>
+        </div>
+        <div className="roja-led__strip-viewport" role="region" aria-label="A moving strip of city photographs">
+          <div className={`roja-led__strip-track${stripPaused ? ' is-paused' : ''}`}>
+            {[0, 1].map((copy) => (
+              <div className="roja-led__strip-group" key={copy} aria-hidden={copy === 1}>
+                {stripFrames.map((album, index) => (
+                  <figure className="roja-led__strip-photo" key={`${album.slug}-${index}`}>
+                    <img src={album.cover} alt={copy === 0 ? album.alt : ''} loading="lazy" />
+                    <figcaption>
+                      <span>0{index + 1}</span>
+                      <span>{album.city} · {album.year}</span>
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+            ))}
           </div>
-        </article>
-
-        <article className="roja-led__chapter roja-led__chapter--second">
-          <div className="roja-led__chapter-copy">
-            <span className="roja-led__chapter-kicker">Chapter 02 <i /> 2024</span>
-            <a href={`/album/${albums[1].slug}`} className="roja-led__chapter-title">{albums[1].title}</a>
-            <span className="roja-led__chapter-city">{albums[1].city}</span>
-            <p>A study of open space, long afternoon light, and the people who give a city its scale.</p>
-            <a href={`/album/${albums[1].slug}`} className="roja-led__open">Enter this chapter <span aria-hidden="true">↗</span></a>
-          </div>
-          <a href={`/album/${albums[1].slug}`} className="roja-led__chapter-image">
-            <img src={albums[1].cover} alt={albums[1].alt} loading="lazy" />
-            <span className="roja-led__frame-label">II / Lisbon, late afternoon</span>
-            <span className="roja-led__frame-number">02</span>
-          </a>
-        </article>
+        </div>
       </section>
 
       <section className="roja-led__interlude">
@@ -106,6 +118,7 @@ export function ImageLed() {
         <a href="#top" className="roja-led__footer-brand">Roja</a>
         <span>© 2026 Roja · Made while walking</span>
         <a href="#top" className="roja-led__back">Back to beginning ↑</a>
+        <a className="roja-led__manage" href="/admin/">Manage <span aria-hidden="true">↗</span></a>
       </footer>
     </main>
   );

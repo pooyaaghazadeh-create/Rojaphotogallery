@@ -285,7 +285,7 @@ button { font: inherit; }
 a { color: inherit; text-decoration: none; }
 ::selection { background: #bd7056; color: #f7f3ea; }
 
-.site-shell { min-height: 100dvh; overflow: hidden; }
+.site-shell { min-height: 100dvh; overflow-x: clip; }
 .topbar { height: 78px; padding: 0 clamp(22px, 6vw, 94px); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--rule); }
 .wordmark { font-family: var(--app-font-serif); font-size: 27px; letter-spacing: -.04em; line-height: 1; }
 .wordmark small { font-family: var(--app-font-mono); font-size: 9px; letter-spacing: .13em; display: block; margin-top: 5px; color: var(--quiet); text-transform: uppercase; }
@@ -324,6 +324,9 @@ a { color: inherit; text-decoration: none; }
 .intro-band p { color: rgba(241,238,230,.72); font-size: 13px; line-height: 1.8; max-width: 420px; margin: 26px 0 0; }
 .footer { padding: 25px clamp(22px, 6vw, 90px); display: flex; justify-content: space-between; gap: 16px; align-items: center; border-top: 1px solid var(--rule); font: 9px var(--app-font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--quiet); }
 .footer a { color: var(--teal); border-bottom: 1px solid currentColor; padding-bottom: 3px; }
+.footer__actions { display: flex; align-items: center; justify-content: flex-end; gap: 18px; margin-left: auto; }
+.footer__manage { min-height: 44px; padding: 0 16px !important; display: inline-flex; align-items: center; justify-content: center; gap: 12px; border: 0 !important; background: var(--teal); color: var(--paper) !important; font: 9px var(--app-font-mono); letter-spacing: .14em; text-decoration: none; }
+.footer__manage span { font-size: 13px; }
 .album-hero { max-width: 1320px; padding: 68px clamp(22px, 6vw, 90px) 50px; margin: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 8vw; align-items: end; }
 .album-hero h1 { font: 400 clamp(58px, 9vw, 120px)/.82 var(--app-font-serif); letter-spacing: -.045em; margin: 27px 0 0; }
 .album-hero-copy { max-width: 400px; color: #59635f; font: 18px/1.55 var(--app-font-serif); }
@@ -443,6 +446,7 @@ a { color: inherit; text-decoration: none; }
   .viewer-close { top: max(10px, env(safe-area-inset-top)); right: 14px; }
   .viewer-prev { left: 10px; }.viewer-next { right: 10px; }
   .footer { flex-wrap: wrap; }
+  .footer__actions { margin-left: auto; }
 }
 @media (min-width: 761px) and (max-width: 900px) {
   .hero { grid-template-columns: 1fr; gap: 32px; padding-top: 72px; }

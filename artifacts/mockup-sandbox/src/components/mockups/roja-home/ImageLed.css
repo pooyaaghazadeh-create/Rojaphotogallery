@@ -5,7 +5,7 @@
   --led-rust: #b96a4f;
   --led-rule: rgba(34, 45, 49, .2);
   min-height: 100dvh;
-  overflow: hidden;
+  overflow-x: clip;
   background: var(--led-paper);
   color: var(--led-ink);
   font-family: var(--app-font-sans);
@@ -13,12 +13,16 @@
 .roja-led *, .roja-led *::before, .roja-led *::after { box-sizing: border-box; }
 .roja-led a { color: inherit; text-decoration: none; }
 .roja-led__topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
   min-height: 92px;
   padding: 0 clamp(24px, 6.3vw, 96px);
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--led-rule);
+  background: var(--led-paper);
 }
 .roja-led__wordmark {
   font: 400 clamp(30px, 3vw, 39px)/1 var(--app-font-serif);
@@ -166,94 +170,84 @@
 .roja-led__section-head h2 em { color: var(--led-teal); font-weight: 400; }
 .roja-led__count { color: #777b75; font: 9px var(--app-font-mono); letter-spacing: .1em; text-transform: uppercase; }
 .roja-led__count span { color: var(--led-rust); margin-right: 10px; }
-.roja-led__chapter {
+.roja-led__strip-controls {
   max-width: 1320px;
-  margin: 0 auto;
+  margin: -22px auto 22px;
   padding: 0 clamp(24px, 7vw, 105px);
-  display: grid;
-  grid-template-columns: 1.35fr .65fr;
+  display: flex;
   align-items: center;
-  gap: clamp(40px, 8vw, 125px);
+  justify-content: space-between;
+  gap: 20px;
+  color: #777b75;
+  font: 9px var(--app-font-mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
 }
-.roja-led__chapter--second {
-  grid-template-columns: .65fr 1.15fr;
-  margin-top: 125px;
-  gap: clamp(50px, 10vw, 150px);
+.roja-led__strip-toggle {
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid rgba(49, 93, 94, .48);
+  background: transparent;
+  color: var(--led-teal);
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font: 9px var(--app-font-mono);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  cursor: pointer;
 }
-.roja-led__chapter-image {
-  display: block;
+.roja-led__strip-toggle span { font-size: 12px; }
+.roja-led__strip-toggle:hover { background: rgba(49, 93, 94, .07); }
+.roja-led__strip-viewport { width: 100%; overflow: hidden; }
+.roja-led__strip-track {
+  display: flex;
+  width: max-content;
+  animation: roja-led-roll 48s linear infinite;
+  will-change: transform;
+}
+.roja-led__strip-track.is-paused { animation-play-state: paused; }
+.roja-led__strip-group {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 14px;
+  padding-right: 14px;
+}
+.roja-led__strip-photo {
+  flex: 0 0 clamp(320px, 42vw, 580px);
+  margin: 0;
+  aspect-ratio: 1.4;
   position: relative;
   overflow: hidden;
   background: #d0c9bd;
 }
-.roja-led__chapter-image img {
+.roja-led__strip-photo::after {
+  content: "";
+  position: absolute;
+  inset: 55% 0 0;
+  pointer-events: none;
+  background: linear-gradient(transparent, rgba(17, 26, 28, .48));
+}
+.roja-led__strip-photo img {
   display: block;
   width: 100%;
-  aspect-ratio: 1.18;
+  height: 100%;
   object-fit: cover;
-  transition: transform .8s cubic-bezier(.2,.7,.2,1);
 }
-.roja-led__chapter--second .roja-led__chapter-image img { aspect-ratio: 1.06; }
-.roja-led__chapter-image:hover img { transform: scale(1.025); }
-.roja-led__frame-label {
+.roja-led__strip-photo figcaption {
   position: absolute;
-  left: 15px;
-  bottom: 14px;
+  z-index: 1;
+  left: 18px;
+  right: 18px;
+  bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
   color: #f4efe7;
-  font: 8px var(--app-font-mono);
+  font: 9px var(--app-font-mono);
   letter-spacing: .12em;
   text-transform: uppercase;
-  text-shadow: 0 1px 12px rgba(0,0,0,.4);
 }
-.roja-led__frame-number {
-  position: absolute;
-  top: 16px;
-  right: 17px;
-  color: #f4efe7;
-  font: 10px var(--app-font-mono);
-  mix-blend-mode: difference;
-}
-.roja-led__chapter-copy { padding: 12px 0; }
-.roja-led__chapter-kicker {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #777a73;
-  font: 9px var(--app-font-mono);
-  letter-spacing: .13em;
-  text-transform: uppercase;
-}
-.roja-led__chapter-kicker i { width: 24px; height: 1px; background: var(--led-rust); }
-.roja-led__chapter-title {
-  display: block;
-  margin: 27px 0 9px;
-  font: 400 clamp(37px, 4.3vw, 57px)/.95 var(--app-font-serif);
-  letter-spacing: -.04em;
-}
-.roja-led__chapter-city {
-  color: var(--led-teal);
-  font: 9px var(--app-font-mono);
-  letter-spacing: .15em;
-  text-transform: uppercase;
-}
-.roja-led__chapter-copy p {
-  max-width: 290px;
-  margin: 28px 0 30px;
-  color: #666c66;
-  font: 400 16px/1.55 var(--app-font-serif);
-}
-.roja-led__open {
-  display: inline-flex;
-  gap: 13px;
-  align-items: center;
-  padding-bottom: 7px;
-  border-bottom: 1px solid rgba(49, 93, 94, .55);
-  color: var(--led-teal);
-  font: 9px var(--app-font-mono);
-  letter-spacing: .1em;
-  text-transform: uppercase;
-}
-.roja-led__open span { font-size: 12px; }
 .roja-led__interlude {
   position: relative;
   display: grid;
@@ -293,9 +287,11 @@
   letter-spacing: .1em;
   text-transform: uppercase;
 }
+.roja-led__footer .roja-led__manage { flex: 0 0 auto; }
 .roja-led__footer-brand { color: var(--led-ink); font: 400 24px var(--app-font-serif); letter-spacing: -.04em; text-transform: none; }
 .roja-led__back { color: var(--led-teal); }
 @keyframes roja-led-appear { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes roja-led-roll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
 @media (max-width: 760px) {
   .roja-led__topbar { min-height: 76px; padding: 12px 21px; }
@@ -316,34 +312,43 @@
   .roja-led__section-head .roja-led__eyebrow { font-size: 8px; letter-spacing: .12em; }
   .roja-led__count { white-space: nowrap; font-size: 8px; }
   .roja-led__count span { margin-right: 5px; }
-  .roja-led__chapter, .roja-led__chapter--second {
-    padding: 0 21px;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 25px;
-  }
-  .roja-led__chapter--second { margin-top: 65px; }
-  .roja-led__chapter--second .roja-led__chapter-copy { order: 2; }
-  .roja-led__chapter-image img, .roja-led__chapter--second .roja-led__chapter-image img { aspect-ratio: .95; }
-  .roja-led__chapter-copy { padding: 0 2px; }
-  .roja-led__chapter-title { margin: 18px 0 7px; font-size: 42px; }
-  .roja-led__chapter-copy p { margin: 20px 0 21px; font-size: 15px; }
+  .roja-led__strip-controls { margin: -14px 0 16px; padding: 0 21px; align-items: end; font-size: 8px; }
+  .roja-led__strip-controls > span { max-width: 130px; line-height: 1.5; }
+  .roja-led__strip-toggle { min-height: 42px; padding: 0 11px; gap: 9px; white-space: nowrap; }
+  .roja-led__strip-photo { flex-basis: 76vw; aspect-ratio: 1.08; }
+  .roja-led__strip-photo figcaption { left: 13px; right: 13px; bottom: 12px; font-size: 8px; }
   .roja-led__interlude { grid-template-columns: 1fr; gap: 25px; padding: 58px 22px 62px; }
   .roja-led__interlude-mark { font-size: 53px; }
   .roja-led__interlude blockquote { font-size: clamp(36px, 9vw, 49px); }
   .roja-led__interlude-aside { display: none; }
   .roja-led__footer { padding: 21px; display: grid; grid-template-columns: 1fr auto; gap: 12px; }
-  .roja-led__footer-brand { grid-row: span 2; }
+  .roja-led__footer-brand { grid-row: span 3; }
   .roja-led__footer > span { justify-self: end; text-align: right; }
   .roja-led__back { justify-self: end; }
+  .roja-led__footer .roja-led__manage { justify-self: end; }
 }
 @media (max-width: 390px) {
   .roja-led__hero { padding-left: 17px; padding-right: 17px; }
   .roja-led__section-head { padding-left: 17px; padding-right: 17px; }
-  .roja-led__chapter, .roja-led__chapter--second { padding-left: 17px; padding-right: 17px; }
+  .roja-led__strip-controls { padding-left: 17px; padding-right: 17px; }
   .roja-led__count { font-size: 7px; letter-spacing: .05em; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .roja-led *, .roja-led *::before, .roja-led *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  .roja-led *:not(.roja-led__strip-track), .roja-led *::before, .roja-led *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+  .roja-led__strip-track {
+    animation: none !important;
+    transform: none !important;
+  }
+  .roja-led__strip-group[aria-hidden="true"] { display: none; }
+  .roja-led__strip-viewport {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .roja-led__strip-photo { scroll-snap-align: start; }
 }
