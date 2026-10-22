@@ -3,7 +3,7 @@ backend:
   repo: pooyaaghazadeh-create/Rojaphotogallery
   branch: main
 
-media_folder: public/uploads
+media_folder: artifacts/roja-gallery/public/uploads
 public_folder: /uploads
 
 collections:
@@ -12,7 +12,7 @@ collections:
     files:
       - name: portfolio
         label: Portfolio content
-        file: public/content/gallery.json
+        file: artifacts/roja-gallery/public/content/gallery.json
         format: json
         fields:
           - label: Photographer
