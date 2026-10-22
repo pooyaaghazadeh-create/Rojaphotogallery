@@ -65,13 +65,14 @@ function useGallery() {
   return { ...state, reload: load };
 }
 
-function SiteHeader({ name }: { name?: string }) {
+function SiteHeader({ name, home = false }: { name?: string; home?: boolean }) {
   return (
-    <header className="topbar">
+    <header className={`topbar${home ? ' roja-home__topbar' : ''}`}>
       <Link href="/" className="wordmark" data-testid="link-home">
         {name || 'Roja'}
         <small>Photographs &amp; field notes</small>
       </Link>
+      {home && <span className="roja-home__edition">An ongoing city archive</span>}
       <a className="nav-link" href="/admin/" data-testid="link-archive-admin">
         Manage <span aria-hidden="true">↗</span>
       </a>
@@ -129,61 +130,113 @@ function HomePage({ gallery }: { gallery: Gallery }) {
 
   const albums = gallery.albums;
   const firstAlbum = albums.find((album) => album.cover) || albums[0];
-  const firstPhoto = firstAlbum?.photos?.[0];
-  const featureImage = firstAlbum?.cover || firstPhoto?.image;
+  const featureImage = firstAlbum?.cover || firstAlbum?.photos?.[0]?.image;
   const intro = gallery.intro?.trim();
+  const featuredAlbumIndex = firstAlbum ? albums.indexOf(firstAlbum) + 1 : 0;
+
+  const renderChapterImage = (album: Album, index: number) => {
+    const image = album.cover || album.photos[0]?.image;
+    const imageContent = image ? (
+      <>
+        <img
+          src={image}
+          alt={`${album.city}, from ${album.title}`}
+          loading="lazy"
+        />
+        <span className="roja-home__frame-label">{album.city} · {album.title}</span>
+        <span className="roja-home__frame-number">{String(index + 1).padStart(2, '0')}</span>
+      </>
+    ) : (
+      <span className="skeleton skeleton-card" aria-hidden="true" />
+    );
+
+    return image ? (
+      <Link
+        href={`/album/${album.slug}`}
+        className="roja-home__chapter-image"
+        data-testid={`link-album-${album.slug}`}
+        aria-label={`Open ${album.title}, ${album.city}`}
+        key={`${album.slug}-image`}
+      >
+        {imageContent}
+      </Link>
+    ) : (
+      <div
+        className="roja-home__chapter-image roja-home__chapter-image--empty"
+        aria-label={`${album.title} album cover`}
+        key={`${album.slug}-image`}
+      >
+        {imageContent}
+      </div>
+    );
+  };
 
   return (
-    <main className="site-shell">
-      <SiteHeader name={gallery.photographer} />
-      <section className="hero entrance">
-        <div>
-          <div className="eyebrow">A living record of elsewhere</div>
-          <h1>City<br /><em>as witness.</em></h1>
+    <main className="site-shell roja-home">
+      <SiteHeader name={gallery.photographer} home />
+      <section className="roja-home__hero entrance" id="top" aria-label="Roja city photography">
+        <div className="roja-home__hero-copy">
+          <div className="eyebrow roja-home__eyebrow"><span aria-hidden="true" />A living record of elsewhere</div>
+          <h1 className="roja-home__title">City<br /><em>as witness.</em></h1>
+          <p className="roja-home__intro">
+            {intro || 'A collection of small moments found in the city’s everyday rhythm.'}
+          </p>
+          <div className="roja-home__byline">{gallery.photographer || 'Roja'} — photographer &amp; observer</div>
+          <a className="roja-home__discover" href="#albums">
+            <span>Explore the archive</span><span aria-hidden="true">↓</span>
+          </a>
         </div>
-        <p className="hero-note">
-          {intro || 'Street corners, passing faces, and the quiet theatre between them.'}
-          <span>Roja — photographer &amp; observer</span>
-        </p>
-      </section>
 
-      {featureImage && firstAlbum ? (
-        <section className="feature entrance" aria-label="Featured album">
-          <Link href={`/album/${firstAlbum.slug}`} className="feature-frame" data-testid={`link-feature-${firstAlbum.slug}`}>
-            <img src={featureImage} alt={firstAlbum.title} />
-            <div className="feature-caption">
+        {featureImage && firstAlbum ? (
+          <Link
+            href={`/album/${firstAlbum.slug}`}
+            className="roja-home__hero-image"
+            data-testid={`link-feature-${firstAlbum.slug}`}
+            aria-label={`Open featured album ${firstAlbum.title}`}
+          >
+            <img src={featureImage} alt={firstAlbum.title} fetchPriority="high" />
+            <div className="roja-home__hero-caption">
               <span>{firstAlbum.city} · {firstAlbum.year}</span>
               <strong>{firstAlbum.title}</strong>
             </div>
+            <span className="roja-home__hero-index">
+              {String(featuredAlbumIndex).padStart(2, '0')} / {String(albums.length).padStart(2, '0')}
+            </span>
           </Link>
-        </section>
-      ) : (
-        <section className="feature" aria-label="Featured photograph">
-          <div className="feature-frame skeleton" />
-        </section>
-      )}
+        ) : (
+          <div className="roja-home__hero-image roja-home__hero-image--empty skeleton" aria-label="Featured photograph loading" />
+        )}
 
-      <section id="albums">
-        <div className="section-head">
+        <div className="roja-home__margin-note" aria-hidden="true">A living record<br />of elsewhere</div>
+      </section>
+
+      <section className="roja-home__chapters" id="albums">
+        <div className="roja-home__section-head">
           <div>
-            <div className="eyebrow">Selected chapters</div>
-            <h2>Places, in passing.</h2>
+            <div className="eyebrow roja-home__eyebrow">Selected chapters</div>
+            <h2>Places, <em>in passing.</em></h2>
           </div>
-          <div className="section-count">{String(albums.length).padStart(2, '0')} albums</div>
+          <div className="roja-home__count"><span>{String(albums.length).padStart(2, '0')}</span> albums in the archive</div>
         </div>
+
         {albums.length ? (
-          <div className="album-grid">
+          <div className="roja-home__chapter-list">
             {albums.map((album, index) => (
-              <article className="album-card entrance" key={album.slug}>
-                <Link href={`/album/${album.slug}`} className="album-cover" data-testid={`link-album-${album.slug}`}>
-                  {album.cover ? <img src={album.cover} alt={`${album.city}, from ${album.title}`} loading="lazy" /> : <div className="skeleton skeleton-card" />}
-                  <span className="album-index">VOL. {String(index + 1).padStart(2, '0')}</span>
-                </Link>
-                <div className="album-meta">
-                  <Link href={`/album/${album.slug}`} className="album-title">{album.title}</Link>
-                  <span className="album-year">{album.year}</span>
+              <article
+                className={`roja-home__chapter${index % 2 === 1 ? ' roja-home__chapter--reverse' : ''}`}
+                key={album.slug}
+              >
+                {index % 2 === 0 && renderChapterImage(album, index)}
+                <div className="roja-home__chapter-copy">
+                  <span className="roja-home__chapter-kicker">Chapter {String(index + 1).padStart(2, '0')} <i aria-hidden="true" /> {album.year}</span>
+                  <Link href={`/album/${album.slug}`} className="roja-home__chapter-title">{album.title}</Link>
+                  <span className="roja-home__chapter-city">{album.city}</span>
+                  {album.description && <p>{album.description}</p>}
+                  <Link href={`/album/${album.slug}`} className="roja-home__open">
+                    Enter this chapter <span aria-hidden="true">↗</span>
+                  </Link>
                 </div>
-                <div className="album-city">{album.city}</div>
+                {index % 2 === 1 && renderChapterImage(album, index)}
               </article>
             ))}
           </div>
@@ -195,12 +248,14 @@ function HomePage({ gallery }: { gallery: Gallery }) {
         )}
       </section>
 
-      <section className="intro-band">
-        <div className="eyebrow">The way I look</div>
-        <div>
+      <section className="intro-band roja-home__interlude">
+        <div className="roja-home__interlude-mark" aria-hidden="true">R.</div>
+        <div className="roja-home__interlude-text">
+          <div className="eyebrow">The way I look</div>
           <blockquote>Cities tell their stories in fragments — light on old stone, the rhythm of a crossing, a face in a window.</blockquote>
           <p>{intro || 'An ongoing practice of looking closely: at light on old stone, the rhythm of a crossing, the people who make a place feel like itself.'}</p>
         </div>
+        <div className="roja-home__interlude-aside">Notes from<br />the walk</div>
       </section>
       <footer className="footer">
         <span>© {new Date().getFullYear()} {gallery.photographer || 'Roja'} · Made while walking</span>
