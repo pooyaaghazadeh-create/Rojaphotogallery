@@ -12,12 +12,22 @@ then rebuilds the site from those commits.
 2. The repository is already set to
    `pooyaaghazadeh-create/Rojaphotogalley` in `public/admin/config.yml`. Set
    `branch` to the branch Netlify publishes if it is not `main`.
-3. In Netlify's authentication-provider settings, enable GitHub authentication
-   for the site. Decap CMS uses Netlify's GitHub authentication endpoint; see
-   [Decap's GitHub backend guide](https://decapcms.org/docs/github-backend/).
+3. Register a GitHub OAuth app at
+   [github.com/settings/developers](https://github.com/settings/developers):
+   - Set its homepage URL to the Netlify site's URL.
+   - Set its authorization callback URL to `https://api.netlify.com/auth/done`.
+   - Copy the Client ID and generate a Client Secret. Keep the secret private;
+     enter it only in Netlify.
+4. In Netlify, open the gallery site and go to **Project configuration →
+   Security → OAuth**. Under **Authentication Providers**, choose **Install
+   Provider → GitHub**, enter the Client ID and Client Secret, and save.
+5. Commit the config change and let Netlify deploy. Open
+   `https://YOUR-SITE/admin/` and sign in with the authorized GitHub account.
    Roja's GitHub account must have permission to push to the content repository.
-4. Commit the config change and let Netlify deploy. Open `https://YOUR-SITE/admin/`
-   and sign in with the authorized GitHub account.
+
+See the official setup guides for
+[Netlify OAuth providers](https://docs.netlify.com/manage/security/secure-access-to-sites/oauth-provider-tokens/)
+and the [Decap CMS GitHub backend](https://decapcms.org/docs/github-backend/).
 
 ## Updating photos and albums
 
