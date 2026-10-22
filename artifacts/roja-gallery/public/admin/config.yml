@@ -29,6 +29,7 @@ collections:
             name: albums
             widget: list
             summary: "{{fields.title}} — {{fields.city}}"
+            collapsed: true
             fields:
               - label: URL slug
                 name: slug
@@ -53,6 +54,7 @@ collections:
                 name: photos
                 widget: list
                 summary: "{{fields.title}}"
+                collapsed: true
                 fields:
                   - label: Photo
                     name: image

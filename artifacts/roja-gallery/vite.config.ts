@@ -27,9 +27,29 @@ if (!basePath) {
   );
 }
 
+function rewriteAdminIndex(req: { url?: string }, next: () => void) {
+  if (req.url === '/admin' || req.url === '/admin/') {
+    req.url = '/admin/index.html';
+  }
+  next();
+}
+
 export default defineConfig({
   base: basePath,
   plugins: [
+    {
+      name: 'admin-index-route',
+      configureServer(server) {
+        server.middlewares.use((req, _res, next) =>
+          rewriteAdminIndex(req, next),
+        );
+      },
+      configurePreviewServer(server) {
+        server.middlewares.use((req, _res, next) =>
+          rewriteAdminIndex(req, next),
+        );
+      },
+    },
     react(),
     tailwindcss(),
     runtimeErrorOverlay(),
