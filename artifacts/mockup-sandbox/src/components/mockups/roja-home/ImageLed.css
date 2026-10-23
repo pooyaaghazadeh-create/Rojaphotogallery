@@ -25,9 +25,10 @@
   background: var(--led-paper);
 }
 .roja-led__wordmark {
-  font: 400 clamp(30px, 3vw, 39px)/1 var(--app-font-serif);
-  letter-spacing: -.055em;
+  font: 400 clamp(30px, 3vw, 39px)/1 'Bodoni Moda', var(--app-font-serif);
+  letter-spacing: -.035em;
 }
+.roja-led__wordmark em { color: var(--led-teal); font-style: italic; }
 .roja-led__manage {
   min-height: 46px;
   padding: 0 19px;

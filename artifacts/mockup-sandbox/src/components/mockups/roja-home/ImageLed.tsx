@@ -40,7 +40,7 @@ export function ImageLed() {
     <main className="roja-led">
       <header className="roja-led__topbar">
         <a href="#top" className="roja-led__wordmark" aria-label="Roja Gallery home">
-          Roja Gallery
+          Roja <em>Gallery</em>
         </a>
       </header>
 

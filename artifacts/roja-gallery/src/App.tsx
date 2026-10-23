@@ -76,7 +76,7 @@ function SiteHeader() {
   return (
     <header className="topbar topbar--gallery">
       <Link href="/" className="wordmark" data-testid="link-home" aria-label="Roja Gallery home">
-        Roja Gallery
+        Roja <em>Gallery</em>
       </Link>
       <nav className="site-nav" aria-label="Main navigation">
         {navItems.map(({ href, label, testId }) => {

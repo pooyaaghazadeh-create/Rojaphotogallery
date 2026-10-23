@@ -23,8 +23,13 @@
 .topbar--gallery .wordmark {
   grid-column: 1;
   justify-self: start;
-  font: 400 clamp(30px, 3vw, 39px)/1 var(--app-font-serif);
-  letter-spacing: -.055em;
+  font: 400 clamp(30px, 3vw, 39px)/1 'Bodoni Moda', var(--app-font-serif);
+  letter-spacing: -.035em;
+}
+
+.topbar--gallery .wordmark em {
+  color: var(--teal);
+  font-style: italic;
 }
 
 .topbar--gallery .wordmark small {
